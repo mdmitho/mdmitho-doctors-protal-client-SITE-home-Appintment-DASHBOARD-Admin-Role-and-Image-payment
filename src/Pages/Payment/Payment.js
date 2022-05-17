@@ -1,7 +1,15 @@
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 import React from 'react';
 import {useQuery} from 'react-query'
 import { useParams } from 'react-router-dom';
 import Loading from "../../Pages/Shared/Loading";
+import CheckoutForm from './CheckoutForm';
+
+
+const stripePromise = loadStripe(
+  "pk_test_51L0VSYHUBVFk2LBWtfGmdETRokplZXrQHyrhVdt0eLv8N1b7fHbagFi0dBOrg2JUt2Xq5BHkZXrHHlfTlCYbiHIc00Y50e7juu"
+);
 
 
 const Payment = () => {
@@ -26,10 +34,10 @@ if(isLoading){
 
         <div class="card w-50 max-w-md bg-primary text-white shadow-xl my-12">
           <div class="card-body">
-              <p className="font-bold">Hello, {appointment.patientName}</p>
+            <p className="font-bold">Hello, {appointment.patientName}</p>
             <h2 class="card-title">Pay for {appointment.treatment}</h2>
             <p>
-             Your Appointment: <span className="text-black"> {appointment.date} </span> at{" "}
+              Your Appointment: <span className="text-black"> {appointment.date} </span> at{" "}
               {appointment.slot}{" "}
             </p>
             <p>Please pay : ${appointment.price}</p>
@@ -41,6 +49,9 @@ if(isLoading){
 
         <div class="card  w-50 max-w-md  flex-shrink-0 w-full shadow-2xl bg-base-100">
           <div class="card-body"></div>
+          <Elements stripe={stripePromise}>
+            <CheckoutForm />
+          </Elements>
         </div>
       </div>
     );
