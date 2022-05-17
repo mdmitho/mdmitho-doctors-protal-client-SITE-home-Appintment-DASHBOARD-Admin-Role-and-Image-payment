@@ -47,7 +47,7 @@ if(isLoading){
           </div>
         </div>
 
-        <div class="card  w-50 max-w-md  flex-shrink-0 w-full shadow-2xl bg-base-100">
+        <div class="card  w-50 max-w-md p-5 flex-shrink-0 w-full shadow-2xl bg-base-100">
           <div class="card-body"></div>
           <Elements stripe={stripePromise}>
             <CheckoutForm />
