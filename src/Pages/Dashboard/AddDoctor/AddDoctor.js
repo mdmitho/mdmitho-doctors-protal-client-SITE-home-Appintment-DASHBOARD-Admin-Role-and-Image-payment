@@ -1,8 +1,8 @@
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
-import { useQuery } from 'react-query';
-import Loading from '../../Shared/Loading'
+import React from "react";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import { useQuery } from "react-query";
+import Loading from "../../Shared/Loading";
 
 const AddDoctor = () => {
   const {
@@ -13,7 +13,7 @@ const AddDoctor = () => {
   } = useForm();
 
   const { data: services, isLoading } = useQuery("services", () =>
-    fetch("http://localhost:5000/service").then((res) => res.json())
+    fetch("https://salty-hollows-38787.herokuapp.com/service").then((res) => res.json())
   );
 
   const imageStorageKey = " 183693e428597732a7f877fdec0e8a05";
@@ -23,60 +23,51 @@ const AddDoctor = () => {
   }
 
   const onSubmit = async (data) => {
-   
-    const image = data.image[0]
+    const image = data.image[0];
     const formData = new FormData();
-    formData.append("image",image);
-const url = `https://api.imgbb.com/1/upload?key=${imageStorageKey}`;
-fetch(url, {
-  method: "POST",
-  body: formData,
-})
-  .then((response) => response.json())
-  .then((result) => {
-    if(result.success){
-      const img = result.data.url
-      const doctor ={
-        name : data.name,
-        email : data.email,
-        specialty:data.specialty,
-        img:img
-      }
-// send to your database
-fetch("http://localhost:5000/doctor",{
-  method:'POST',
-  headers:{
-    'content-type':'application/json',
-    authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-  },
-  body:JSON.stringify(doctor)
-})
-.then(res => res.json())
-.then(inserted => {
+    formData.append("image", image);
+    const url = `https://api.imgbb.com/1/upload?key=${imageStorageKey}`;
+    fetch(url, {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        if (result.success) {
+          const img = result.data.url;
+          const doctor = {
+            name: data.name,
+            email: data.email,
+            specialty: data.specialty,
+            img: img,
+          };
+          // send to your database
+          fetch("https://salty-hollows-38787.herokuapp.com/doctor", {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+              authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+            body: JSON.stringify(doctor),
+          })
+            .then((res) => res.json())
+            .then((inserted) => {
+              if (inserted.insertedId) {
+                toast.success("Doctor added successfully");
+                reset();
+              } else {
+                toast.error("Failed to add the doctor");
+              }
 
-if (inserted.insertedId){
-  toast.success('Doctor added successfully')
-  reset()
-}
-else{
-  toast.error('Failed to add the doctor')
-}
-
-
-
-
-
-// console.log("doctor inserted", inserted);
-})
-
-    }
-    // console.log("imgbb:", result);
-  });
-
+              // console.log("doctor inserted", inserted);
+            });
+        }
+        // console.log("imgbb:", result);
+      });
   };
 
   /**
-   * 
+   *
    * img rakhar oawy
    * 3 ways to store images
    * 1. Third party storage //Free open public storage is ok for Practice project

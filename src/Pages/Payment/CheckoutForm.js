@@ -1,5 +1,5 @@
-import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import React,{useEffect, useState} from 'react';
+import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import React, { useEffect, useState } from "react";
 
 const CheckoutForm = ({ appointment }) => {
   const stripe = useStripe();
@@ -10,10 +10,10 @@ const CheckoutForm = ({ appointment }) => {
   const [clientSecret, setClientSecret] = useState("");
   const [processing, setProcessing] = useState(false);
 
-  const { _id,price, patient, patientName } = appointment;
+  const { _id, price, patient, patientName } = appointment;
 
   useEffect(() => {
-    fetch("http://localhost:5000/create-payment-intent", {
+    fetch("https://salty-hollows-38787.herokuapp.com/create-payment-intent", {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -47,50 +47,48 @@ const CheckoutForm = ({ appointment }) => {
     setCardError(error?.message || "");
     setSuccess("");
 
-    setProcessing(true)
-// confirm card payment
+    setProcessing(true);
+    // confirm card payment
 
-const { paymentIntent, error: intentError } = await stripe.confirmCardPayment(clientSecret, {
-  payment_method: {
-    card: card,
-    billing_details: {
-      name: patientName,
-      email: patient
-    },
-  },
-});
+    const { paymentIntent, error: intentError } = await stripe.confirmCardPayment(
+      clientSecret,
+      {
+        payment_method: {
+          card: card,
+          billing_details: {
+            name: patientName,
+            email: patient,
+          },
+        },
+      }
+    );
 
-
-if(intentError){
-  setCardError(intentError?.message)
-  setProcessing(false)
-  
-}
-else{
-  setCardError('')
-  setTransactionId(paymentIntent.id)
-  setSuccess('Congrats! Your payment is completed ')
-}
-//store payment on database
-const payment = {
-  appointment: _id,
-  transactionId: paymentIntent.id,
-};
-fetch(`http://localhost:5000/booking/${_id}`, {
-  method: 'PATCH',
-  headers: {
-      'content-type': 'application/json',
-      'authorization': `Bearer ${localStorage.getItem('accessToken')}`
-  },
-  body: JSON.stringify(payment)
-}).then(res=>res.json())
-.then(data => {
-  setProcessing(false);
-  console.log(data);
-})
-
-
-
+    if (intentError) {
+      setCardError(intentError?.message);
+      setProcessing(false);
+    } else {
+      setCardError("");
+      setTransactionId(paymentIntent.id);
+      setSuccess("Congrats! Your payment is completed ");
+    }
+    //store payment on database
+    const payment = {
+      appointment: _id,
+      transactionId: paymentIntent.id,
+    };
+    fetch(`https://salty-hollows-38787.herokuapp.com/booking/${_id}`, {
+      method: "PATCH",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      body: JSON.stringify(payment),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setProcessing(false);
+        console.log(data);
+      });
   };
   return (
     <>
@@ -123,8 +121,10 @@ fetch(`http://localhost:5000/booking/${_id}`, {
       {cardError && <p className="text-red-500">{cardError}</p>}
       {success && (
         <div className="text-green-500">
-
-          <p>Your transaction Id : <span className='text-orange-500 font-bold'>{transactionId}</span></p>
+          <p>
+            Your transaction Id :{" "}
+            <span className="text-orange-500 font-bold">{transactionId}</span>
+          </p>
         </div>
       )}
     </>
