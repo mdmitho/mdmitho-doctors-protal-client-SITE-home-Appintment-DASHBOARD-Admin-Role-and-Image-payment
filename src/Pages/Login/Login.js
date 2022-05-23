@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import Loading from "../Shared/Loading";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import useToken from "../../Hooks/useToken";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const [signInWithGoogle, gUser, gLoading, gError] = useSignInWithGoogle(auth);
@@ -24,8 +25,9 @@ const [token] = useToken(user|| gUser)
 
 useEffect(()=>{
 
-  if (token) {
+  if (user) {
     navigate(from, { replace: true });
+    toast.success("Successfully Login!");
   }
 },[user,gUser,from,navigate,token])
 
